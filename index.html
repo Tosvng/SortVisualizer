@@ -1,31 +1,114 @@
 <html>
-  <script src="https://cdn.anychart.com/releases/8.0.0/js/anychart-base.min.js"></script>
-  <script>
-    function sort() {
-      console.log("button clicked");
-      generateRandomNumbers(10);
-      console.log(values);
-      //console.log(num.toString(), num2.toString());
+  <head>
+    <link rel="stylesheet" href="PageDesign.css" />
+  </head>
+  <body onload="setup()">
+    <h1 id="title">Merge Sort Visualizer</h1>
+    <br />
+    <canvas id="myCanvas"></canvas>
+    <br />
+    <button type="button" onclick="sort()">SORT</button>
+    <button type="button" onclick="setup()">RESET</button>
+  </body>
 
+  <script>
+    values = [];
+
+    //https://code.tutsplus.com/tutorials/how-to-draw-bar-charts-using-javascript-and-html5-canvas--cms-28561
+    var myCanvas = document.getElementById("myCanvas");
+    myCanvas.width = 500;
+    myCanvas.height = 500;
+
+    var ctx = myCanvas.getContext("2d");
+
+    function drawBars(x, y, w, h) {
+      ctx.fillStyle = "#add8e6";
+      ctx.fillRect(x, y, w, h);
+    }
+    function drawLine(ctx, startX, startY, endX, endY, color) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawBar(
+      ctx,
+      upperLeftCornerX,
+      upperLeftCornerY,
+      width,
+      height,
+      color
+    ) {
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.fillRect(upperLeftCornerX, upperLeftCornerY, width, height);
+      ctx.restore();
+    }
+
+    /*
+     ** This is what is show when the screen is first loaded up
+     ** This function draws the bars for the unsorted arrays
+     */
+    function setup() {
+      values = [];
+      //clear the canvas
+      //ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+
+      //generate the random numbers
+      generateRandomNumbers(10);
+
+      //draw  values in canvas
+      drawGraph();
+    }
+
+    function sort() {
       mergeSort(values);
 
-      for (i in values) {
+      //let data = {};
+      for (let i = 0; i < values.length; i++) {
         console.log(values[i].toString());
+        //data[values[i].toString()] = values[i].getValue();
       }
+      drawGraph();
+
       values = [];
       //   console.log(values);
     }
 
-    values = [];
+    function drawGraph() {
+      //clear the canvas
+      ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+      let prevX = 2;
+
+      //the width of each bar
+      let barWidth = myCanvas.width / values[0].getScale() - 2;
+
+      //draw
+      for (let i = 0; i < values.length; i++) {
+        console.log(values[i].toString());
+        //data[values[i].toString()] = values[i].getValue();
+        let barHeight = values[i].getValue();
+
+        drawBars(prevX, myCanvas.height - barHeight, barWidth, barHeight);
+        prevX = prevX + barWidth + 2;
+      }
+    }
 
     class Number {
       constructor(value, scale) {
-        this.scale = 10 / scale;
-        this.value = value;
+        this.scale = 100 / scale;
+        this.value = value * scale;
       }
 
       getValue() {
         return this.value;
+      }
+      getScale() {
+        return this.scale;
       }
       toString() {
         return this.value;
@@ -104,10 +187,4 @@
       }
     }
   </script>
-
-  <body>
-    <p id="id"></p>
-    <br />
-    <button type="button" onclick="sort()">SORT</button>
-  </body>
 </html>
