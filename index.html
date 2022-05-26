@@ -1,190 +1,37 @@
+<link
+  rel="stylesheet"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+  crossorigin="anonymous"
+/>
+<link rel="stylesheet" href="PageDesign.css" />
 <html>
-  <head>
-    <link rel="stylesheet" href="PageDesign.css" />
-  </head>
-  <body onload="setup()">
-    <h1 id="title">Merge Sort Visualizer</h1>
-    <br />
-    <canvas id="myCanvas"></canvas>
-    <br />
-    <button type="button" onclick="sort()">SORT</button>
-    <button type="button" onclick="setup()">RESET</button>
+  <head> </head>
+  <body class="container container-fluid" onload="setup()">
+    <div class="header">
+      <h1 id="title">Merge Sort Visualizer</h1>
+
+      <select class="dropdown" id="step" onchange="setup()">
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+
+    <div style="text-align: center">
+      <canvas id="myCanvas"></canvas>
+    </div>
+
+    <div class="button-box">
+      <button class="btn sort-button" type="button" onclick="doSort()">
+        SORT
+      </button>
+      <button class="btn reset-button" type="button" onclick="setup()">
+        RESET
+      </button>
+    </div>
   </body>
 
-  <script>
-    values = [];
-
-    //https://code.tutsplus.com/tutorials/how-to-draw-bar-charts-using-javascript-and-html5-canvas--cms-28561
-    var myCanvas = document.getElementById("myCanvas");
-    myCanvas.width = 500;
-    myCanvas.height = 500;
-
-    var ctx = myCanvas.getContext("2d");
-
-    function drawBars(x, y, w, h) {
-      ctx.fillStyle = "#add8e6";
-      ctx.fillRect(x, y, w, h);
-    }
-    function drawLine(ctx, startX, startY, endX, endY, color) {
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.beginPath();
-      ctx.moveTo(startX, startY);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function drawBar(
-      ctx,
-      upperLeftCornerX,
-      upperLeftCornerY,
-      width,
-      height,
-      color
-    ) {
-      ctx.save();
-      ctx.fillStyle = color;
-      ctx.fillRect(upperLeftCornerX, upperLeftCornerY, width, height);
-      ctx.restore();
-    }
-
-    /*
-     ** This is what is show when the screen is first loaded up
-     ** This function draws the bars for the unsorted arrays
-     */
-    function setup() {
-      values = [];
-      //clear the canvas
-      //ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
-
-      //generate the random numbers
-      generateRandomNumbers(10);
-
-      //draw  values in canvas
-      drawGraph();
-    }
-
-    function sort() {
-      mergeSort(values);
-
-      //let data = {};
-      for (let i = 0; i < values.length; i++) {
-        console.log(values[i].toString());
-        //data[values[i].toString()] = values[i].getValue();
-      }
-      drawGraph();
-
-      values = [];
-      //   console.log(values);
-    }
-
-    function drawGraph() {
-      //clear the canvas
-      ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
-      let prevX = 2;
-
-      //the width of each bar
-      let barWidth = myCanvas.width / values[0].getScale() - 2;
-
-      //draw
-      for (let i = 0; i < values.length; i++) {
-        console.log(values[i].toString());
-        //data[values[i].toString()] = values[i].getValue();
-        let barHeight = values[i].getValue();
-
-        drawBars(prevX, myCanvas.height - barHeight, barWidth, barHeight);
-        prevX = prevX + barWidth + 2;
-      }
-    }
-
-    class Number {
-      constructor(value, scale) {
-        this.scale = 100 / scale;
-        this.value = value * scale;
-      }
-
-      getValue() {
-        return this.value;
-      }
-      getScale() {
-        return this.scale;
-      }
-      toString() {
-        return this.value;
-      }
-    }
-
-    function generateRandomNumbers(scale) {
-      for (let i = 0; i < scale; i++) {
-        //generate a random number between 0 - the number provided
-        let newNumber = Math.floor(Math.random() * scale + 1);
-        let numberObject = new Number(newNumber, scale);
-
-        //add the number to the array of values
-        values.push(numberObject);
-      }
-
-      //just to be sure it is random
-      //shuffle(values);
-    }
-
-    function mergeSort(A) {
-      mergeSortRecurse(A, 0, A.length - 1);
-    }
-
-    /*
-     ** Merge Sort helper, divides the array into halves, and then call the merge function to combine two sorted halves
-     */
-    function mergeSortRecurse(A, lo, hi) {
-      if (lo < hi) {
-        let mid = Math.floor((lo + hi) / 2);
-        mergeSortRecurse(A, lo, mid);
-        mergeSortRecurse(A, mid + 1, hi);
-        merge(A, lo, mid, hi);
-      }
-    }
-
-    function merge(A, lo, mid, hi) {
-      const n = hi - lo + 1;
-      const merged = new Array(10);
-      let i = lo;
-      let j = mid + 1;
-      let k = 0;
-
-      //compare the start of the array with the midpoint of the array
-      //adding the smaller values to the new array (merged) first
-      while (i < mid + 1 && j <= hi) {
-        if (A[i].getValue() <= A[j].getValue()) {
-          merged[k] = A[i];
-          k++;
-          i++;
-        } else {
-          merged[k] = A[j];
-          k++;
-          j++;
-        }
-      }
-
-      //add the remaing values form either the left half or the right half of the input array to the new array(merged)
-
-      //left half
-      while (i < mid + 1) {
-        merged[k] = A[i];
-        k++;
-        i++;
-      }
-      //right half
-      while (j <= hi) {
-        merged[k] = A[j];
-        k++;
-        j++;
-      }
-
-      //update the input array
-      for (k = 0; k < n; k++) {
-        A[lo + k] = merged[k];
-      }
-    }
-  </script>
+  <script type="text/javascript" src="SortVisualizer.js"></script>
 </html>
